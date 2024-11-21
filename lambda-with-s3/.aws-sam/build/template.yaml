@@ -1,0 +1,22 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'lambda-s3-operation
+
+  Sample SAM Template for lambda-s3-operation
+
+  '
+Globals:
+  Function:
+    Timeout: 20
+Resources:
+  S3FileUploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: S3FileUploadFunction
+      Handler: com.aws.s3.services.handlers.fileupload.S3FileUploadHandler::handleRequest
+      Runtime: java11
+      Architectures:
+      - x86_64
+      MemorySize: 512
+    Metadata:
+      SamResourceId: S3FileUploadFunction

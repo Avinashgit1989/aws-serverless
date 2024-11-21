@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  error-response-example
+
+  Sample SAM Template for error-response-example
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+    Runtime: java11
+    Architectures:
+      - x86_64
+    MemorySize: 512
+    Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
+      Variables:
+        PARAM1: VALUE  
+
+Resources:
+  DivisionExampleFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: ErrorResponseExample
+      Handler: com.appsdeveloperblog.aws.errorresponse.lambda.DivisionExampleFunction::handleRequest
+      Events:
+        DefaultErrorResponseExample:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /divide
+            Method: get
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  DivisionApi:
+    Description: "API Gateway endpoint URL for Prod stage for Division Example Function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/divide"
+  DivisionExampleFunction:
+    Description: "Division Example Function ARN"
+    Value: !GetAtt DivisionExampleFunction.Arn
+  DivisionExampleFunctionIamRole:
+    Description: "Implicit IAM Role created for Division Example Function"
+    Value: !GetAtt DivisionExampleFunctionRole.Arn

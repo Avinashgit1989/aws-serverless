@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'environment-variables-example
+
+  Sample SAM Template for environment-variables-example
+
+  '
+Globals:
+  Function:
+    Timeout: 20
+    Environment:
+      Variables:
+        My_VARIABLE: AQICAHj4EUA6xmRPyu5UoJLV7ujQmG6B/URSZzK0rZCqin0NlAE0+UQURM71HZVVAeMOObe/AAAAdDByBgkqhkiG9w0BBwagZTBjAgEAMF4GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMPbTYjNGJyzzY8ZZ3AgEQgDEaA6d+/i3zxUESdVaU9sYQtFvWzmV6ABnNj+ZaSZCNWPJmtY+rScyKQ1A7bsm4tB2a
+        MY_COGNITO_USER_POOL_ID: AQICAHj4EUA6xmRPyu5UoJLV7ujQmG6B/URSZzK0rZCqin0NlAEuIAr7qz2T1cLUq3VUut1MAAAAZDBiBgkqhkiG9w0BBwagVTBTAgEAME4GCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMn4mbM5it8ih70bo1AgEQgCHCfjUDluHvl9MHXnQria43WmxvW/7YgGr7hoAluWuWgvI=
+        My_COGNITO_APP_SECRET: AQICAHj4EUA6xmRPyu5UoJLV7ujQmG6B/URSZzK0rZCqin0NlAHYA5lHIb6A+F0wJHf8PnwxAAAAaDBmBgkqhkiG9w0BBwagWTBXAgEAMFIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMRJu2d30mjDnUhxXGAgEQgCXa9CRPpeiamvYMZGC/U4UOM9kjCsUaPRMpKMdghXl6MB79JT48
+Resources:
+  EnvironmentVariablesExampleFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: EnvironmentVariablesExampleFunction
+      Handler: com.appsdeveloperblog.aws.lambda.EnvironmentVariablesExample::handleRequest
+      Runtime: java11
+      Architectures:
+      - x86_64
+      MemorySize: 512
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+    Metadata:
+      SamResourceId: EnvironmentVariablesExampleFunction
+Outputs:
+  EnvironmentVariablesExampleApi:
+    Description: API Gateway endpoint URL for Prod stage for EnvironmentVariablesExample
+      function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  EnvironmentVariablesExampleFunction:
+    Description: EnvironmentVariablesExample Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - EnvironmentVariablesExampleFunction
+      - Arn
+  EnvironmentVariablesExampleFunctionIamRole:
+    Description: Implicit IAM Role created for EnvironmentVariablesExample function
+    Value:
+      Fn::GetAtt:
+      - EnvironmentVariablesExampleFunctionRole
+      - Arn

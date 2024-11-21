@@ -1,0 +1,60 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'users-rest-sam-api
+
+  Sample SAM Template for users-rest-sam-api
+
+  '
+Globals:
+  Function:
+    Timeout: 20
+    Runtime: java8.al2
+    Architectures:
+    - x86_64
+    MemorySize: 512
+    LoggingConfig:
+      LogFormat: JSON
+Resources:
+  PostUserHandlerLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: PostUserHandlerLambdaFunction
+      Handler: com.rest.sam.api.PostUserHandler::handleRequest
+      Events:
+        PostUsers:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+    Metadata:
+      SamResourceId: PostUserHandlerLambdaFunction
+  ApplicationResourceGroup:
+    Type: AWS::ResourceGroups::Group
+    Properties:
+      Name:
+        Fn::Sub: ApplicationInsights-SAM-${AWS::StackName}
+      ResourceQuery:
+        Type: CLOUDFORMATION_STACK_1_0
+  ApplicationInsightsMonitoring:
+    Type: AWS::ApplicationInsights::Application
+    Properties:
+      ResourceGroupName:
+        Ref: ApplicationResourceGroup
+      AutoConfigurationEnabled: 'true'
+Outputs:
+  PostSamRestApi:
+    Description: An API endpoints to create new users
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/
+  PostUserHandlerLambdaFunction:
+    Description: PostUserHandlerLambdaFunction Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - PostUserHandlerLambdaFunction
+      - Arn
+  PostUserHandlerLambdaFunctionIamRole:
+    Description: Implicit IAM Role created for PostUserHandlerLambda function
+    Value:
+      Fn::GetAtt:
+      - PostUserHandlerLambdaFunctionRole
+      - Arn

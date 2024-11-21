@@ -1,0 +1,2 @@
+com\aws\s3\services\handlers\fileRead\S3FileReadHandler.class
+com\aws\s3\services\handlers\fileupload\S3FileUploadHandler.class

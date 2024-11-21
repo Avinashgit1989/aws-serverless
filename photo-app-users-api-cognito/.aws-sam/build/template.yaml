@@ -1,0 +1,127 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: 'photo-app-users-api-cognito
+
+  Sample SAM Template for photo-app-users-api-cognito
+
+  '
+Globals:
+  Function:
+    Timeout: 20
+    Runtime: java11
+    Architectures:
+    - x86_64
+    MemorySize: 512
+    Environment:
+      Variables:
+        MY_COGNITO_POOL_APP_CLIENT_ID: AQICAHj4EUA6xmRPyu5UoJLV7ujQmG6B/URSZzK0rZCqin0NlAELB/d/QT+62OwG8y/selsrAAAAeDB2BgkqhkiG9w0BBwagaTBnAgEAMGIGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMZ3kGg7gANLDCbTc2AgEQgDWgebqdhXz8lFiBWlhs8CbIk8nWPX+pFqSO9Jhx2gT5y24gb7vlNZqLKzWT3fQvTt5X+XARQA==
+        MY_COGNITO_POOL_APP_CLIENT_SECRET: AQICAHj4EUA6xmRPyu5UoJLV7ujQmG6B/URSZzK0rZCqin0NlAGap67w96sVrkd0NFmUkUvWAAAAlTCBkgYJKoZIhvcNAQcGoIGEMIGBAgEAMHwGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMD8lzG8/j45VuIDOGAgEQgE/1P3t8z/quRJZ5H7uTchTisZ/CSJ2EGIc/Y5/ny1fIw+t80xdGJaEKiLInGKCNCVPXUholCuXAxkiNHPmpxhNE765UXoiP6FTpODXPWlPO
+        MY_COGNITO_POOL_ID: AQICAHj4EUA6xmRPyu5UoJLV7ujQmG6B/URSZzK0rZCqin0NlAEa1tCVOm4JVFZCMqfmOjpnAAAAcTBvBgkqhkiG9w0BBwagYjBgAgEAMFsGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMNyQ5K5r641m6ODjPAgEQgC6brWAvaHI/zhq54IZfy/nIYLLYsI4IKQ2lycS1jdnwdkL5e2cWpWyKa88hNu1q
+Resources:
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      DefinitionBody:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: ..\..\open-api.yaml
+  CreateUserHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: CreateUserHandlerFunction
+      Handler: com.appsdeveloperblog.aws.lambda.CreateUserHandler::handleRequest
+      Events:
+        CreateUser:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: post
+            RestApiId:
+              Ref: MyApi
+    Metadata:
+      SamResourceId: CreateUserHandlerFunction
+  ConfirmUserHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ConfirmUserHandlerFunction
+      Handler: com.appsdeveloperblog.aws.lambda.ConfirmUserHandler::handleRequest
+      Events:
+        ConfirmUser:
+          Type: Api
+          Properties:
+            Path: /confirm
+            Method: post
+            RestApiId:
+              Ref: MyApi
+    Metadata:
+      SamResourceId: ConfirmUserHandlerFunction
+  LoginUserHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: LoginUserHandlerFunction
+      Handler: com.appsdeveloperblog.aws.lambda.handler.LoginUserHandler::handleRequest
+      Events:
+        LoginUser:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: post
+            RestApiId:
+              Ref: MyApi
+    Metadata:
+      SamResourceId: LoginUserHandlerFunction
+  AddUserToGroupHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: AddUserToGroupHandlerFunction
+      Handler: com.appsdeveloperblog.aws.lambda.handler.AddUserToGroupHandler::handleRequest
+      Policies:
+        Version: '2012-10-17'
+        Statement:
+          Effect: Allow
+          Action: cognito-idp:AdminAddUserToGroup
+          Resource: arn:aws:cognito-idp:us-east-1:835819417203:userpool/us-east-1_1NNdv1tCz
+      Events:
+        AddUserToGroup:
+          Type: Api
+          Properties:
+            Path: /users/{userName}/add-to-group
+            Method: post
+            RestApiId:
+              Ref: MyApi
+    Metadata:
+      SamResourceId: AddUserToGroupHandlerFunction
+  GetUserHandlerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetUserHandlerFunction
+      Handler: com.appsdeveloperblog.aws.lambda.handler.GetUserHandler::handleRequest
+      Events:
+        AddUserToGroup:
+          Type: Api
+          Properties:
+            Path: /users/me
+            Method: get
+            RestApiId:
+              Ref: MyApi
+    Metadata:
+      SamResourceId: GetUserHandlerFunction
+Outputs:
+  CreateUserApi:
+    Description: API Gateway endpoint URL for Prod stage for CreateUserHandler Function
+    Value:
+      Fn::Sub: https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/
+  CreateUserHandlerFunction:
+    Description: CreateUserHandler Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - CreateUserHandlerFunction
+      - Arn
+  CreateUserHandlerFunctionIamRole:
+    Description: Implicit IAM Role created for CreateUserHandler
+    Value:
+      Fn::GetAtt:
+      - CreateUserHandlerFunctionRole
+      - Arn
